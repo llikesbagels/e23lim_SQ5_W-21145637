@@ -20,8 +20,10 @@ The console will show any errors in your sketch.
 
 | File | Source |
 |------|--------|
-| [1]`assets/images/banf.png` | FeralFenton, Opengameart.org |
+| [1]`assets/images/banf.png` | FeralFenton, professor_walk_cycle_no_hat - Opengameart.org |
+
 | [2]`assets/images/skull.png` | Hung514, skull — Nico-Nextbot.fandom.com |
+
 | [3]`assets/images/winscreen.jpg` | Bhahtiar Nugroho Adiputro, Retro Game Pixel Background — vecteezy.com |
 
 ## References
