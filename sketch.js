@@ -1,25 +1,10 @@
-// ============================================================
-// Week 5 Example 3 — Maze with Animated Character and Coins
-// ============================================================
-// This sketch combines everything from Examples 1 and 2:
-//   - Animated walking character (4 directions)
-//   - Animated spinning coins
-//   - A hardcoded maze drawn with shapes
-//   - Wall collision to keep the player inside the maze
-//   - Collect all coins to unlock the exit
-// ============================================================
 
-
-// ------------------------------------------------------------
-// SPRITE CONFIGURATION — Walking Character
-// Same structure as Example 1. See that file for full notes.
-// ------------------------------------------------------------
 const SPRITE = {
-  frameWidth:  65.5,  // width of one frame  (300px / 4 frames)
-  frameHeight: 50, // height of one frame (600px / 4 rows)
-  numFrames:   9,   // frames per row
-  animSpeed:   15,  // draw() frames per sprite frame (higher = slower)
-  scale:       0.7, // draw at half original size
+  frameWidth:  65.5,  
+  frameHeight: 50, 
+  numFrames:   9,   
+  animSpeed:   15,  
+  scale:       0.7, 
 
 
 
@@ -28,8 +13,6 @@ const SPRITE = {
 
 
 
-  // Row index for each direction
-  // Change these if your sheet has a different row order
   rows: {
     up:  0,
     left:    1,
@@ -51,34 +34,17 @@ const SPRITE = {
 
 
 
-// ------------------------------------------------------------
-// COIN CONFIGURATION
-// Same structure as Example 2. See that file for full notes.
-// ------------------------------------------------------------
 const COIN = {
-  frameWidth:  50,  // 256px total / 8 frames
-  frameHeight: 50,  // only one row, full sheet height
-  numFrames:  5,   // 8 frames of spin animation
-  animSpeed:   6,   // draw() frames per sprite frame (lower = faster)
-  scale:       1.5, // scale up so the coin is visible on screen
-
+  frameWidth:  50, 
+  frameHeight: 50, 
+  numFrames:  5,  
+  animSpeed:   6,  
+  scale:       1.5, 
 
 };
 
 
-// ------------------------------------------------------------
-// MAZE
-// A 2D array where each number represents one tile type.
-// The maze is 16 tiles wide and 10 tiles tall.
-// TILE_SIZE controls how large each tile is drawn in pixels.
-//
-// Tile values:
-//   0 = floor (walkable)
-//   1 = wall
-//   2 = start position
-//   3 = coin location
-//   4 = exit (locked until all coins collected)
-// ------------------------------------------------------------
+
 const TILE_SIZE = 50;
 
 
@@ -96,107 +62,71 @@ const MAZE = [
 ];
 
 
-// Colours for each tile type — stored as RGB arrays
 
 
 const TILE_COLORS = {
-  0: [128, 115, 24 ], // floor — dark grey // add stuff here
-  1: [128,  180,  16], // wall  — purple-grey
-  2: [140, 115, 24 ], // start — same as floor
-  3: [140, 115, 24 ], // coin  — same as floor (coin drawn on top)
-  4: [0,  215, 180 ], // exit  — green tint when locked
+  0: [128, 115, 24 ], 
+  1: [128,  180,  16], 
+  2: [140, 115, 24 ], 
+  3: [140, 115, 24 ], 
+  4: [0,  215, 180 ], 
 };
 
-
-// ------------------------------------------------------------
-// PLAYER
-// x and y track the centre position on the canvas.
-// hw and hh are the half-dimensions of the collision box —
-// smaller than the sprite for a tighter feel.
-// ------------------------------------------------------------
 let player = {
   x: 0,
   y: 0,
   speed: 2,
 
 
-  // Animation state
   currentFrame: 0,
   frameTimer:   0,
   direction:    "down",
   isMoving:     false,
 
 
-  // Collision box half-dimensions
-  // Smaller than the sprite so the player can navigate tight corridors
-  hw: 12, // half width
-  hh: 12, // half height
+  hw: 12, 
+  hh: 12, 
 };
 
 
-// ------------------------------------------------------------
-// COINS
-// Built from the maze data in setup() — any tile marked 3
-// becomes a coin object with its own position and frame counter.
-// ------------------------------------------------------------
 let coins = [];
 let coinsCollected = 0;
 
 
-// ------------------------------------------------------------
-// GAME STATE
-// ------------------------------------------------------------
 let gameWon = false;
 
 
-// Images
 let characterSheet;
 let coinSheet;
 let winScreen;
 
 
-// ============================================================
-// preload()
-// Runs once before setup(). Loads both sprite sheets so they
-// are ready before the sketch tries to use them.
-// ============================================================
 function preload() {
-  characterSheet = loadImage("assets/images/banf.png");
-  coinSheet      = loadImage("assets/images/skull.png");
-    winScreen     = loadImage("assets/images/winscreen.jpg");
+  characterSheet = loadImage("assets/images/banf.png"); //[1]
+  coinSheet      = loadImage("assets/images/skull.png");//[2]
+    winScreen     = loadImage("assets/images/winscreen.jpg");//[3]
 
 }
 
 
-// ============================================================
-// setup()
-// Runs once at the very start of the sketch.
-// Canvas size is calculated from the maze dimensions so it
-// always fits exactly. Loops through the maze to find the
-// start tile and all coin tiles.
-// ============================================================
 function setup() {
-  // Size the canvas to fit the maze exactly
   createCanvas(TILE_SIZE * MAZE[0].length, TILE_SIZE * MAZE.length);
   imageMode(CENTER);
 
 
-  // Scan the maze array to find the start position and coin locations
   for (let row = 0; row < MAZE.length; row++) {
     for (let col = 0; col < MAZE[row].length; col++) {
       let tile = MAZE[row][col];
 
 
       if (tile === 2) {
-        // Place the player in the centre of the start tile
         player.x = col * TILE_SIZE + TILE_SIZE / 2;
         player.y = row * TILE_SIZE + TILE_SIZE / 2;
       }
 
 
       if (tile === 3) {
-        // Create a coin object for each coin tile
-        // Random start frame so coins don't all spin in sync
+      
         coins.push({
           x:          col * TILE_SIZE + TILE_SIZE / 2,
           y:          row * TILE_SIZE + TILE_SIZE / 2,
@@ -210,12 +140,6 @@ function setup() {
 }
 
 
-// ============================================================
-// draw()
-// Runs repeatedly in a loop after setup() finishes.
-// Order matters — maze is drawn first so everything else
-// appears on top of it.
-// ============================================================
 function draw() {
   background(20);
 
@@ -232,20 +156,12 @@ function draw() {
   drawHUD();
 
 
-  // Win screen is drawn last so it appears on top of everything
   if (gameWon) {
     drawWinScreen();
   }
 }
 
 
-// ------------------------------------------------------------
-// drawMaze()
-// Loops through every tile in the maze array and draws a
-// rectangle for it. rectMode(CORNER) means x, y is the
-// top-left of each tile.
-// The exit tile changes colour when all coins are collected.
-// ------------------------------------------------------------
 function drawMaze() {
   rectMode(CORNER);
   noStroke();
@@ -256,12 +172,11 @@ function drawMaze() {
       let tile = MAZE[row][col];
 
 
-      // Exit tile changes colour when all coins are collected
       if (tile === 4) {
         if (coinsCollected === coins.length) {
-          fill(30, 200, 120); // bright green — exit is open
+          fill(30, 200, 120);
         } else {
-          fill(60, 100, 80);  // dim green — exit is locked
+          fill(60, 100, 80);  
         }
       } else {
         let c = TILE_COLORS[tile];
@@ -275,12 +190,6 @@ function drawMaze() {
 }
 
 
-// ------------------------------------------------------------
-// updateCoins()
-// Loops through every coin and advances its animation frame.
-// Skips coins that have already been collected.
-// Each coin has its own frameTimer so they animate independently.
-// ------------------------------------------------------------
 function updateCoins() {
   for (let i = 0; i < coins.length; i++) {
     if (coins[i].collected) continue; // skip collected coins
@@ -294,12 +203,6 @@ function updateCoins() {
   }
 }
 
-
-// ------------------------------------------------------------
-// drawCoins()
-// Loops through every coin and draws it at its current frame.
-// Skips coins that have already been collected.
-// ------------------------------------------------------------
 function drawCoins() {
   for (let i = 0; i < coins.length; i++) {
     if (coins[i].collected) continue; // skip collected coins
@@ -308,8 +211,6 @@ function drawCoins() {
     let coin = coins[i];
 
 
-    // Source x position on the sprite sheet
-    // Coins have only one row so sy is always 0
     let sx = coin.frame * COIN.frameWidth;
     let dw = COIN.frameWidth  * COIN.scale;
     let dh = COIN.frameHeight * COIN.scale;
@@ -319,14 +220,6 @@ function drawCoins() {
   }
 }
 
-
-// ------------------------------------------------------------
-// handleInput()
-// Moves the player and sets the correct facing direction.
-// Each direction is checked independently so diagonal
-// movement works naturally — holding W and D moves up-right.
-// Returns early if the game is already won.
-// ------------------------------------------------------------
 function handleInput() {
   if (gameWon) return;
 
@@ -357,18 +250,7 @@ function handleInput() {
 }
 
 
-// ------------------------------------------------------------
-// resolveWallCollisions()
-// Checks all four corners of the player's collision box
-// against the maze tile at each corner's position.
-// If a corner is inside a wall tile, the player is pushed
-// out from the smallest overlapping direction.
-//
-// This approach handles diagonal wall contacts correctly
-// and prevents the player from getting stuck on corners.
-// ------------------------------------------------------------
 function resolveWallCollisions() {
-  // The four corners of the player's collision box
   let corners = [
     { x: player.x - player.hw, y: player.y - player.hh }, // top left
     { x: player.x + player.hw, y: player.y - player.hh }, // top right
@@ -381,17 +263,14 @@ function resolveWallCollisions() {
     let c = corners[i];
 
 
-    // Convert pixel position to tile coordinates
     let col = floor(c.x / TILE_SIZE);
     let row = floor(c.y / TILE_SIZE);
 
 
-    // Skip if outside the maze array bounds
     if (row < 0 || row >= MAZE.length || col < 0 || col >= MAZE[0].length) continue;
 
 
     if (MAZE[row][col] === 1) {
-      // Calculate how far the player is overlapping each side of the wall tile
       let tileLeft   = col * TILE_SIZE;
       let tileRight  = tileLeft + TILE_SIZE;
       let tileTop    = row * TILE_SIZE;
@@ -404,7 +283,6 @@ function resolveWallCollisions() {
       let overlapBottom = tileBottom - (player.y - player.hh);
 
 
-      // Push the player out from the side with the smallest overlap
       let minOverlap = min(overlapLeft, overlapRight, overlapTop, overlapBottom);
 
 
@@ -417,18 +295,11 @@ function resolveWallCollisions() {
 }
 
 
-// ------------------------------------------------------------
-// checkCoinCollection()
-// Uses dist() to check if the player is close enough to
-// collect each coin. A threshold of 60% of TILE_SIZE feels
-// natural — not too generous, not too strict.
-// ------------------------------------------------------------
 function checkCoinCollection() {
   for (let i = 0; i < coins.length; i++) {
     if (coins[i].collected) continue;
 
 
-    // dist() returns the distance between two points
     let d = dist(player.x, player.y, coins[i].x, coins[i].y);
     if (d < TILE_SIZE * 0.6) {
       coins[i].collected = true;
@@ -438,14 +309,9 @@ function checkCoinCollection() {
 }
 
 
-// ------------------------------------------------------------
-// checkExit()
-// Only active once all coins are collected.
-// Scans the maze for the exit tile (4) and checks whether
-// the player is close enough to trigger a win.
-// ------------------------------------------------------------
+
 function checkExit() {
-  if (coinsCollected < coins.length) return; // exit is still locked
+  if (coinsCollected < coins.length) return;
 
 
   for (let row = 0; row < MAZE.length; row++) {
@@ -462,21 +328,12 @@ function checkExit() {
 }
 
 
-// ------------------------------------------------------------
-// animateSprite()
-// Advances the animation frame at a controlled speed.
-// frameTimer counts up every draw() call.
-// When it reaches animSpeed, the frame advances.
-// Only animates when the player is moving — stays on frame 0
-// when idle so the character stands still.
-// ------------------------------------------------------------
 function animateSprite() {
   if (player.isMoving) {
     player.frameTimer++;
 
 
-    // When the timer reaches animSpeed, advance to the next frame
-    // % numFrames wraps back to 0 after the last frame
+   
     if (player.frameTimer >= SPRITE.animSpeed) {
       player.frameTimer = 0;
       player.currentFrame = (player.currentFrame + 1) % SPRITE.numFrames;
@@ -489,33 +346,16 @@ function animateSprite() {
 }
 
 
-// ------------------------------------------------------------
-// drawCharacter()
-// Draws one frame from the sprite sheet using image() with
-// source rectangle parameters.
-//
-// image(img, dx, dy, dw, dh, sx, sy, sw, sh)
-//   dx, dy — where to draw on the canvas (destination centre)
-//   dw, dh — how large to draw it (destination size)
-//   sx, sy — where to start reading from the sprite sheet
-//   sw, sh — how many pixels to read from the sheet
-//
-// sx slides along the row by multiplying frame number by
-// frameWidth. sy selects the row by multiplying the row
-// index by frameHeight.
-// ------------------------------------------------------------
+
 function drawCharacter() {
-  // Get the correct row and offset for the current direction
   let row    = SPRITE.rows[player.direction];
   let offset = SPRITE.offsets[player.direction];
 
 
-  // Source position on the sprite sheet (with offset applied)
   let sx = (player.currentFrame * SPRITE.frameWidth)  + offset.x;
   let sy = (row                 * SPRITE.frameHeight) + offset.y;
 
 
-  // Draw size (original frame size multiplied by scale)
   let dw = SPRITE.frameWidth  * SPRITE.scale;
   let dh = SPRITE.frameHeight * SPRITE.scale;
 
@@ -523,12 +363,6 @@ function drawCharacter() {
   image(characterSheet, player.x, player.y, dw, dh, sx, sy, SPRITE.frameWidth, SPRITE.frameHeight);
 }
 
-
-// ------------------------------------------------------------
-// drawHUD()
-// HUD = Heads Up Display.
-// Shows coin count and exit status at the top of the screen.
-// ------------------------------------------------------------
 function drawHUD() {
   noStroke();
   fill(255);
@@ -546,12 +380,6 @@ function drawHUD() {
 }
 
 
-// ------------------------------------------------------------
-// drawWinScreen()
-// Draws a semi-transparent overlay and win message on top
-// of everything else. Called last in draw() so it appears
-// in front of the maze, character, and HUD.
-// ------------------------------------------------------------
 function drawWinScreen() {
   fill(0, 0, 0, 160);
   rectMode(CORNER);
