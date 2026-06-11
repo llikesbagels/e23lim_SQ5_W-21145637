@@ -97,12 +97,14 @@ const MAZE = [
 
 
 // Colours for each tile type — stored as RGB arrays
+
+
 const TILE_COLORS = {
-  0: [40,  40,  50 ], // floor — dark grey
-  1: [80,  60,  100], // wall  — purple-grey
-  2: [40,  40,  50 ], // start — same as floor
-  3: [40,  40,  50 ], // coin  — same as floor (coin drawn on top)
-  4: [60,  100, 80 ], // exit  — green tint when locked
+  0: [128, 115, 24 ], // floor — dark grey // add stuff here
+  1: [128,  180,  16], // wall  — purple-grey
+  2: [140, 115, 24 ], // start — same as floor
+  3: [140, 115, 24 ], // coin  — same as floor (coin drawn on top)
+  4: [0,  215, 180 ], // exit  — green tint when locked
 };
 
 
@@ -150,6 +152,7 @@ let gameWon = false;
 // Images
 let characterSheet;
 let coinSheet;
+let winScreen;
 
 
 // ============================================================
@@ -160,6 +163,8 @@ let coinSheet;
 function preload() {
   characterSheet = loadImage("assets/images/banf.png");
   coinSheet      = loadImage("assets/images/skull.png");
+    winScreen     = loadImage("assets/images/winscreen.jpg");
+
 }
 
 
@@ -550,18 +555,18 @@ function drawHUD() {
 function drawWinScreen() {
   fill(0, 0, 0, 160);
   rectMode(CORNER);
-  rect(0, 0, width, height);
+  image(winScreen, 0, 0, width * 2, height * 2);
 
 
   fill(255);
   textAlign(CENTER);
   textSize(48);
-  text("You Escaped!", width / 2, height / 2 - 20);
+  text("Mamma Mia, You Did It!", width / 2, height / 2 - 20);
 
 
   textSize(16);
   fill(180);
-  text("All coins collected", width / 2, height / 2 + 20);
+  text("All Skulls Taken", width / 2, height / 2 + 20);
 }
 
 
